@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="编程随笔" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>vtk医学影像方向 | Kollen</title>
+<link rel="shortcut icon" href="https://kollen.cn/favicon.ico?v=1753868442156">
+<link rel="stylesheet" href="https://kollen.cn/styles/main.css">
+
+
+  <link rel="canonical" href="https://kollen.cn/post/vtk-yi-xue-ying-xiang-fang-xiang/" />
+  <meta name="socialText" content="" />
+  <meta name="description" content="矢状面（sagittal）
+static double sagittalElements[16] = {
+		0, 0, -1, 0,
+		1, 0, 0, 0,
+		0, -1, 0, 0,
+		0, 0, 0, 1
+	};
+
+平行于YO..." />
+  <meta name="referrer" content="always" />
+  
+  
+    
+  
+</head>
+
+<body class="is-preload">
+  <!-- Wrapper -->
+  <div id="wrapper">
+
+    <!-- Header -->
+<header id="header">
+  <div class="inner">
+    <!-- Logo -->
+    <a href="https://kollen.cn" class="logo">
+      <span class="symbol"
+        ><img
+          src="https://kollen.cn/images/avatar.png?v=1753868442156"
+          alt=""
+        />
+      </span>
+      <div class="site-title"> Kollen </div>
+    </a>
+
+    <!-- Nav -->
+    <nav>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+  <ul>
+    
+    
+      <li><a href="/" class="menu">
+        首页
+      </a></li>
+      
+    
+    
+      <li><a href="/archives" class="menu">
+        归档
+      </a></li>
+      
+    
+    
+      <li><a href="/tags" class="menu">
+        标签
+      </a></li>
+      
+    
+    
+      <li><a href="/post/about" class="menu">
+        关于
+      </a></li>
+      
+    
+  </ul>
+</nav>
+
+    <!-- Main -->
+    <div id="main">
+      <div class="inner">
+        <div class="post-pagetitle">
+          <h1>
+            vtk医学影像方向
+          </h1>
+        </div>
+        <div class="post-info">
+          <time class="post-time">
+            2025-07-24
+          </time>
+          <span class="read-times">
+            2 min read
+          </span>
+          
+          <a href="https://kollen.cn/tag/FHVxYYOg0g/" class="post-tags">
+            # vtk
+          </a>
+          
+        </div>
+        
+        <img src='https://kollen.cn/post-images/vtk-yi-xue-ying-xiang-fang-xiang.jpg' class="post-feature" alt="" />
+        
+        <div class="post-content-wrapper">
+          <div class="post-content">
+            <h3 id="矢状面sagittal">矢状面（sagittal）</h3>
+<pre><code class="language-c++">static double sagittalElements[16] = {
+		0, 0, -1, 0,
+		1, 0, 0, 0,
+		0, -1, 0, 0,
+		0, 0, 0, 1
+	};
+</code></pre>
+<p>平行于YOZ平面的切面</p>
+<h3 id="冠状面coronal">冠状面（coronal）</h3>
+<pre><code class="language-c++">static double coronalElements[16] = {
+		1, 0, 0, 0,
+		0, 0, 1, 0,
+		0, -1, 0, 0,
+		0, 0, 0, 1};
+</code></pre>
+<p>平行于XOZ的切面</p>
+<h3 id="横断面axial">横断面（axial）</h3>
+<pre><code class="language-c++">static double axialElements[16] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1};
+</code></pre>
+<p>平行于XOY的切面</p>
+<pre><code class="language-c++">	vtkSmartPointer&lt;vtkMatrix4x4&gt;
+		resliceAxes = vtkSmartPointer&lt;vtkMatrix4x4&gt;::New();
+	resliceAxes-&gt;DeepCopy(sagittalElements);
+	resliceAxes-&gt;SetElement(0, 3, center[0]);
+	resliceAxes-&gt;SetElement(1, 3, center[1]);
+	resliceAxes-&gt;SetElement(2, 3, center[2]);
+</code></pre>
+<p>设置的是行对应的值</p>
+<h3 id="注释">注释</h3>
+<p>矩阵为行主序<br>
+对于这个切割的矩阵只需要重点关注Z轴的方向，为切割平面的法向，XY轴要与Z轴形成右手坐标系<br>
+X方向代表最终成像的右方向，Y方向表示最终成像的上方向</p>
+
+          </div>
+          <div class="toc-container">
+            <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%9F%A2%E7%8A%B6%E9%9D%A2sagittal">矢状面（sagittal）</a></li>
+<li><a href="#%E5%86%A0%E7%8A%B6%E9%9D%A2coronal">冠状面（coronal）</a></li>
+<li><a href="#%E6%A8%AA%E6%96%AD%E9%9D%A2axial">横断面（axial）</a></li>
+<li><a href="#%E6%B3%A8%E9%87%8A">注释</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="page-count">
+          
+
+          
+        </div>
+      </div>
+
+      <div class="post-pagination inner">
+        
+        <div class="next-post">
+          <div>
+            <a href="https://kollen.cn/post/vtk-xuan-ran-liu-cheng/">下一篇</a>
+          </div>
+        </div>
+        
+        
+        <div class="prev-post">
+          <div>
+            <a href="https://kollen.cn/post/cesium-zuo-biao-xi-zhuan-huan/">上一篇</a>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <!-- back to top -->
+    <button oneclik="topFunction()" id="BackToTop">
+      TOP
+    </button>
+
+    <div class="post-comment inner">
+      <div class="post-comment">
+        
+
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer id="footer">
+  <div class="inner">
+    <section>
+      <h2>Follow</h2>
+      <ul class="icons">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+    <ul class="copyright">
+      <li>
+        <a href="https://kollen.cn/atom.xml" target="_blank">
+          RSS
+        </a> 
+      </li>
+      <li><a href="https://github.com/wherelse/gridea-theme-phantom">Theme Phantom</a></li>
+      <li>Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a></li>
+      
+    </ul>
+  </div>
+</footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://kollen.cn/media/scripts/jquery.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/highlight.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/browser.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/breakpoints.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/util.js"></script>
+  <script src="https://kollen.cn/media/scripts/main.js"></script>
+  <!--  -->
+  <script>hljs.highlightAll();</script>
+  <script>
+    post_scroll();
+    back_to_top();
+  </script>
+</body>
+
+</html>

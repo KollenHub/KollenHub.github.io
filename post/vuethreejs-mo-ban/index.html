@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="编程随笔" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>vue+threejs模板 | Kollen</title>
+<link rel="shortcut icon" href="https://kollen.cn/favicon.ico?v=1753868442156">
+<link rel="stylesheet" href="https://kollen.cn/styles/main.css">
+
+
+  <link rel="canonical" href="https://kollen.cn/post/vuethreejs-mo-ban/" />
+  <meta name="socialText" content="" />
+  <meta name="description" content="代码
+&amp;lt;script setup lang=&amp;quot;ts&amp;quot;&amp;gt;
+import router from &#39;@/router&#39;;
+import * as THREE from &#39;three&#39;;
+import { ref,..." />
+  <meta name="referrer" content="always" />
+  
+  
+    
+  
+</head>
+
+<body class="is-preload">
+  <!-- Wrapper -->
+  <div id="wrapper">
+
+    <!-- Header -->
+<header id="header">
+  <div class="inner">
+    <!-- Logo -->
+    <a href="https://kollen.cn" class="logo">
+      <span class="symbol"
+        ><img
+          src="https://kollen.cn/images/avatar.png?v=1753868442156"
+          alt=""
+        />
+      </span>
+      <div class="site-title"> Kollen </div>
+    </a>
+
+    <!-- Nav -->
+    <nav>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+  <ul>
+    
+    
+      <li><a href="/" class="menu">
+        首页
+      </a></li>
+      
+    
+    
+      <li><a href="/archives" class="menu">
+        归档
+      </a></li>
+      
+    
+    
+      <li><a href="/tags" class="menu">
+        标签
+      </a></li>
+      
+    
+    
+      <li><a href="/post/about" class="menu">
+        关于
+      </a></li>
+      
+    
+  </ul>
+</nav>
+
+    <!-- Main -->
+    <div id="main">
+      <div class="inner">
+        <div class="post-pagetitle">
+          <h1>
+            vue+threejs模板
+          </h1>
+        </div>
+        <div class="post-info">
+          <time class="post-time">
+            2025-06-23
+          </time>
+          <span class="read-times">
+            3 min read
+          </span>
+          
+          <a href="https://kollen.cn/tag/Q-7ayyswPU/" class="post-tags">
+            # three
+          </a>
+          
+          <a href="https://kollen.cn/tag/V-p6XoqNSF/" class="post-tags">
+            # 前端
+          </a>
+          
+        </div>
+        
+        <img src='https://kollen.cn/post-images/vuethreejs-mo-ban.jpg' class="post-feature" alt="" />
+        
+        <div class="post-content-wrapper">
+          <div class="post-content">
+            <h3 id="代码">代码</h3>
+<pre><code class="language-ts">&lt;script setup lang=&quot;ts&quot;&gt;
+import router from '@/router';
+import * as THREE from 'three';
+import { ref, type Ref, nextTick } from 'vue';
+import { onMounted } from 'vue';
+const props = defineProps({
+    title: String,
+    OnThreeLoaded: Function,
+    Tick: Function,
+})
+
+const handleClick = () =&gt; {
+    router.back();
+}
+
+const threeContainer: Ref&lt;HTMLElement | null&gt; = ref(null);
+
+let renderer: THREE.WebGLRenderer | null = null;
+
+let camera: THREE.PerspectiveCamera | null = null;
+
+let scene: THREE.Scene | null = null;
+
+let cube: THREE.Mesh | null = null;
+
+onMounted(() =&gt; {
+
+    nextTick(() =&gt; {
+        if (!threeContainer.value) return
+
+        // 初始化场景
+        scene = new THREE.Scene()
+
+        // 初始化相机
+        camera = new THREE.PerspectiveCamera(75, threeContainer.value.offsetWidth / threeContainer.value.offsetHeight, 0.1, 1000)
+        camera.position.z = 5
+        //添加摄像机
+        scene.add(camera);
+
+        // 添加物体
+        const geometry = new THREE.BoxGeometry()
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        cube = new THREE.Mesh(geometry, material)
+        scene.add(cube)
+
+        // 初始化渲染器
+        renderer = new THREE.WebGLRenderer({ antialias: true })
+        renderer.setSize(threeContainer.value.offsetWidth, threeContainer.value.offsetHeight)
+        //新写法
+        renderer.setAnimationLoop(tick)
+        threeContainer.value.appendChild(renderer.domElement)
+
+        // 通知父组件
+        props.OnThreeLoaded?.(scene, camera, renderer)
+
+        // 启动渲染循环(旧写法)
+        // tick(0)
+    })
+
+
+    let previousTime = 0
+
+    const tick = (time: number) =&gt; {
+        if (renderer&amp;&amp;scene&amp;&amp;camera) {
+            const deltaTime = (time - previousTime)
+
+            if (cube)
+                cube.rotation.y += 0.001*deltaTime
+            //Tick
+            props.Tick?.(time, deltaTime);
+            renderer.render(scene!, camera!);
+            previousTime = time
+            //渲染旧写法
+            // window.requestAnimationFrame(tick)
+        }
+    }
+})
+&lt;/script&gt;
+</code></pre>
+<h3 id="模板">模板</h3>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;div class=&quot;layout&quot;&gt;
+        &lt;div class=&quot;iconfont icon-guanbi&quot; @click=&quot;handleClick&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;title&quot;&gt;{{ props.title }}&lt;/div&gt;
+        &lt;div class=&quot;three-container&quot; ref=&quot;threeContainer&quot;&gt;
+
+        &lt;/div&gt;
+        &lt;slot&gt;
+
+        &lt;/slot&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+</code></pre>
+<h3 id="样式">样式</h3>
+<pre><code class="language-css">&lt;style scoped&gt;
+.three-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.layout {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+.icon-guanbi {
+    font-size: 30px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+}
+
+.icon-guanbi:hover,
+.icon-guanbi:focus {
+    color: #ff0000;
+    font-size: 32px;
+}
+
+.icon-guanbi:active {
+    color: #2494da;
+    font-size: 30px;
+}
+
+.title {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    z-index: 1;
+}
+&lt;/style&gt;
+</code></pre>
+
+          </div>
+          <div class="toc-container">
+            <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E4%BB%A3%E7%A0%81">代码</a></li>
+<li><a href="#%E6%A8%A1%E6%9D%BF">模板</a></li>
+<li><a href="#%E6%A0%B7%E5%BC%8F">样式</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="page-count">
+          
+
+          
+        </div>
+      </div>
+
+      <div class="post-pagination inner">
+        
+        <div class="next-post">
+          <div>
+            <a href="https://kollen.cn/post/linux-cao-zuo/">下一篇</a>
+          </div>
+        </div>
+        
+        
+        <div class="prev-post">
+          <div>
+            <a href="https://kollen.cn/post/vtk-xuan-ran-liu-cheng/">上一篇</a>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <!-- back to top -->
+    <button oneclik="topFunction()" id="BackToTop">
+      TOP
+    </button>
+
+    <div class="post-comment inner">
+      <div class="post-comment">
+        
+
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer id="footer">
+  <div class="inner">
+    <section>
+      <h2>Follow</h2>
+      <ul class="icons">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+    <ul class="copyright">
+      <li>
+        <a href="https://kollen.cn/atom.xml" target="_blank">
+          RSS
+        </a> 
+      </li>
+      <li><a href="https://github.com/wherelse/gridea-theme-phantom">Theme Phantom</a></li>
+      <li>Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a></li>
+      
+    </ul>
+  </div>
+</footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://kollen.cn/media/scripts/jquery.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/highlight.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/browser.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/breakpoints.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/util.js"></script>
+  <script src="https://kollen.cn/media/scripts/main.js"></script>
+  <!--  -->
+  <script>hljs.highlightAll();</script>
+  <script>
+    post_scroll();
+    back_to_top();
+  </script>
+</body>
+
+</html>

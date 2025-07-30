@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="编程随笔" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cesium坐标系转换 | Kollen</title>
+<link rel="shortcut icon" href="https://kollen.cn/favicon.ico?v=1753868442156">
+<link rel="stylesheet" href="https://kollen.cn/styles/main.css">
+
+
+  <link rel="canonical" href="https://kollen.cn/post/cesium-zuo-biao-xi-zhuan-huan/" />
+  <meta name="socialText" content="" />
+  <meta name="description" content="Cesium 坐标分类
+1.屏幕坐标（像素）
+即二维笛卡尔平面坐标，我们通过鼠标点击直接获取的坐标就是屏幕坐标了，单位是像素值，也可以通过new Cesium.Cartesian2(x, y)创建。
+2.笛卡尔空间直角坐标
+笛卡尔空间直角坐..." />
+  <meta name="referrer" content="always" />
+  
+  
+    
+  
+</head>
+
+<body class="is-preload">
+  <!-- Wrapper -->
+  <div id="wrapper">
+
+    <!-- Header -->
+<header id="header">
+  <div class="inner">
+    <!-- Logo -->
+    <a href="https://kollen.cn" class="logo">
+      <span class="symbol"
+        ><img
+          src="https://kollen.cn/images/avatar.png?v=1753868442156"
+          alt=""
+        />
+      </span>
+      <div class="site-title"> Kollen </div>
+    </a>
+
+    <!-- Nav -->
+    <nav>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+  <ul>
+    
+    
+      <li><a href="/" class="menu">
+        首页
+      </a></li>
+      
+    
+    
+      <li><a href="/archives" class="menu">
+        归档
+      </a></li>
+      
+    
+    
+      <li><a href="/tags" class="menu">
+        标签
+      </a></li>
+      
+    
+    
+      <li><a href="/post/about" class="menu">
+        关于
+      </a></li>
+      
+    
+  </ul>
+</nav>
+
+    <!-- Main -->
+    <div id="main">
+      <div class="inner">
+        <div class="post-pagetitle">
+          <h1>
+            Cesium坐标系转换
+          </h1>
+        </div>
+        <div class="post-info">
+          <time class="post-time">
+            2025-07-30
+          </time>
+          <span class="read-times">
+            4 min read
+          </span>
+          
+          <a href="https://kollen.cn/tag/CLUW1GJSW2/" class="post-tags">
+            # cesium
+          </a>
+          
+          <a href="https://kollen.cn/tag/mwv1t1vz3GE/" class="post-tags">
+            # gis
+          </a>
+          
+        </div>
+        
+        <img src='https://kollen.cn/post-images/cesium-zuo-biao-xi-zhuan-huan.jpg' class="post-feature" alt="" />
+        
+        <div class="post-content-wrapper">
+          <div class="post-content">
+            <h1 id="cesium-坐标分类">Cesium 坐标分类</h1>
+<h2 id="1屏幕坐标像素">1.屏幕坐标（像素）</h2>
+<p>即二维笛卡尔平面坐标，我们通过鼠标点击直接获取的坐标就是屏幕坐标了，单位是像素值，也可以通过new Cesium.Cartesian2(x, y)创建。</p>
+<h2 id="2笛卡尔空间直角坐标">2.笛卡尔空间直角坐标</h2>
+<p>笛卡尔空间直角坐标又称为世界坐标，Cesium中用Cartesian3变量表示，可通过new Cesium.Cartesian3(x, y, z)创建，主要是用来做空间位置的变化如平移、旋转和缩放等等，它的坐标原点在椭球的中心，如下图所示：<br>
+<img src="https://kollen.cn/post-images/1753867861189.jpg" alt="" loading="lazy"></p>
+<h2 id="3地理坐标弧度">3.地理坐标（弧度）</h2>
+<p>Cesium中的地理坐标单位默认是弧度制，用Cartographic变量表示，可通过new Cesium.Cartographic(longitude, latitude, height)创建，其中这里的参数是用弧度表示的经纬度，即经度和纬度。弧度即角度对应弧长是半径的倍数。<br>
+角度转弧度 π/180×角度<br>
+弧度变角度 180/π×弧度<br>
+<img src="https://kollen.cn/post-images/1753867917664.jpg" alt="" loading="lazy"></p>
+<h2 id="4经纬度坐标">4.经纬度坐标</h2>
+<p>即测绘中的地理经纬度坐标，默认是WGS84坐标系，坐标原点在椭球的质心。<br>
+<img src="https://kollen.cn/post-images/1753868073682.jpg" alt="" loading="lazy"><br>
+经度：参考椭球面上某点的大地子午面与本初子午面间的两面角，东正西负。<br>
+纬度 ：参考椭球面上某点的法线与赤道平面的夹角，北正南负。<br>
+Cesuim中没有具体的经纬度对象，要得到经纬度首先需要计算为弧度，再进行转换。Cesium提供了如下对应的转换方法：</p>
+<pre><code class="language-js">// 经纬度转弧度 
+Cesium.Math.toRadians(degrees) 
+// 弧度转经纬度
+Cesium.Math.toDegrees(radians) 
+</code></pre>
+<h1 id="cesium中常用的坐标变换">Cesium中常用的坐标变换</h1>
+<h2 id="1经纬度转世界坐标">1.经纬度转世界坐标</h2>
+<p>Cesium提供了两种方式将经纬度坐标转成世界坐标。</p>
+<pre><code class="language-js">// 方法1：直接转换 
+// var cartesian3 = Cesium.Cartesian3.fromDegrees(lng, lat, height); 
+// 方法2：借助ellipsoid对象，先转换成弧度再转换 
+var cartographic = Cesium.Cartographic.fromDegrees(lng, lat, height); //单位：度，度，米 
+var cartesian3 = ellipsoid.cartographicToCartesian(cartographic); 
+</code></pre>
+<h2 id="2世界坐标转经纬度">2.世界坐标转经纬度</h2>
+<pre><code class="language-js">// 3.笛卡尔空间直角坐标系转为地理坐标（弧度制） 
+// var cartographic = Cesium.Cartographic.fromCartesian(cartesian3); 
+// 方法1 
+// var cartographic = ellipsoid.cartesianToCartographic(cartesian3); 
+// 方法2 
+// 4.地理坐标（弧度制）转为经纬度坐标
+var lat = Cesium.Math.toDegrees(cartographic.latitude);
+var lng = Cesium.Math.toDegrees(cartographic.longitude); 
+var height = cartographic.height; 
+</code></pre>
+<h2 id="3弧度和经纬度互转">3.弧度和经纬度互转</h2>
+<ul>
+<li>经纬度转弧度：</li>
+</ul>
+<pre><code class="language-js">Cesium.Math.toRadians(degrees) 
+</code></pre>
+<ul>
+<li>弧度转经纬度</li>
+</ul>
+<pre><code class="language-js">Cesium.Math.toDegrees(radians) 
+</code></pre>
+<h2 id="4屏幕坐标和世界坐标互转">4.屏幕坐标和世界坐标互转</h2>
+<ul>
+<li>屏幕转世界坐标：</li>
+</ul>
+<pre><code class="language-js">// 2.二维屏幕坐标转为三维笛卡尔空间直角坐标（世界坐标） 
+var cartesian3 = scene.globe.pick(    viewer.camera.getPickRay(windowPostion),    scene ); 
+</code></pre>
+<ul>
+<li>世界坐标转屏幕坐标：</li>
+</ul>
+<pre><code class="language-js">// 三维笛卡尔空间直角坐标（世界坐标）转为二维屏幕坐标 
+// 结果是Cartesian2对象，取出X,Y即为屏幕坐标。  
+windowPostion = Cesium.SceneTransforms.wgs84ToWindowCoordinates(scene, cartesian3); 
+</code></pre>
+<h2 id="坐标转换工具">坐标转换工具</h2>
+<p>只有转换到笛卡尔坐标系后才能运用计算机图形学中的仿射变换知识进行空间位置变换如平移旋转缩放。Cesium为我们提供了如下几种很有用的变换工具类：<br>
+Cesium.Cartesian3（相当于Point3D）<br>
+Cesium.Matrix3（3x3矩阵，用于描述旋转变换）<br>
+Cesium.Matrix4（4x4矩阵，用于描述旋转加平移变换）<br>
+Cesium.Quaternion（四元数，用于描述围绕某个向量旋转一定角度的变换）<br>
+Cesium.Transforms(包含将位置转换为各种参考系的功能)</p>
+
+          </div>
+          <div class="toc-container">
+            <ul class="markdownIt-TOC">
+<li><a href="#cesium-%E5%9D%90%E6%A0%87%E5%88%86%E7%B1%BB">Cesium 坐标分类</a>
+<ul>
+<li><a href="#1%E5%B1%8F%E5%B9%95%E5%9D%90%E6%A0%87%E5%83%8F%E7%B4%A0">1.屏幕坐标（像素）</a></li>
+<li><a href="#2%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A9%BA%E9%97%B4%E7%9B%B4%E8%A7%92%E5%9D%90%E6%A0%87">2.笛卡尔空间直角坐标</a></li>
+<li><a href="#3%E5%9C%B0%E7%90%86%E5%9D%90%E6%A0%87%E5%BC%A7%E5%BA%A6">3.地理坐标（弧度）</a></li>
+<li><a href="#4%E7%BB%8F%E7%BA%AC%E5%BA%A6%E5%9D%90%E6%A0%87">4.经纬度坐标</a></li>
+</ul>
+</li>
+<li><a href="#cesium%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%9D%90%E6%A0%87%E5%8F%98%E6%8D%A2">Cesium中常用的坐标变换</a>
+<ul>
+<li><a href="#1%E7%BB%8F%E7%BA%AC%E5%BA%A6%E8%BD%AC%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87">1.经纬度转世界坐标</a></li>
+<li><a href="#2%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E8%BD%AC%E7%BB%8F%E7%BA%AC%E5%BA%A6">2.世界坐标转经纬度</a></li>
+<li><a href="#3%E5%BC%A7%E5%BA%A6%E5%92%8C%E7%BB%8F%E7%BA%AC%E5%BA%A6%E4%BA%92%E8%BD%AC">3.弧度和经纬度互转</a></li>
+<li><a href="#4%E5%B1%8F%E5%B9%95%E5%9D%90%E6%A0%87%E5%92%8C%E4%B8%96%E7%95%8C%E5%9D%90%E6%A0%87%E4%BA%92%E8%BD%AC">4.屏幕坐标和世界坐标互转</a></li>
+<li><a href="#%E5%9D%90%E6%A0%87%E8%BD%AC%E6%8D%A2%E5%B7%A5%E5%85%B7">坐标转换工具</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="page-count">
+          
+
+          
+        </div>
+      </div>
+
+      <div class="post-pagination inner">
+        
+        <div class="next-post">
+          <div>
+            <a href="https://kollen.cn/post/vtk-yi-xue-ying-xiang-fang-xiang/">下一篇</a>
+          </div>
+        </div>
+        
+        
+      </div>
+
+    </div>
+
+    <!-- back to top -->
+    <button oneclik="topFunction()" id="BackToTop">
+      TOP
+    </button>
+
+    <div class="post-comment inner">
+      <div class="post-comment">
+        
+
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer id="footer">
+  <div class="inner">
+    <section>
+      <h2>Follow</h2>
+      <ul class="icons">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+    <ul class="copyright">
+      <li>
+        <a href="https://kollen.cn/atom.xml" target="_blank">
+          RSS
+        </a> 
+      </li>
+      <li><a href="https://github.com/wherelse/gridea-theme-phantom">Theme Phantom</a></li>
+      <li>Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a></li>
+      
+    </ul>
+  </div>
+</footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://kollen.cn/media/scripts/jquery.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/highlight.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/browser.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/breakpoints.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/util.js"></script>
+  <script src="https://kollen.cn/media/scripts/main.js"></script>
+  <!--  -->
+  <script>hljs.highlightAll();</script>
+  <script>
+    post_scroll();
+    back_to_top();
+  </script>
+</body>
+
+</html>

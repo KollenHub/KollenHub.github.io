@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+<meta name="description" content="编程随笔" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VTK渲染流程 | Kollen</title>
+<link rel="shortcut icon" href="https://kollen.cn/favicon.ico?v=1753868442156">
+<link rel="stylesheet" href="https://kollen.cn/styles/main.css">
+
+
+  <link rel="canonical" href="https://kollen.cn/post/vtk-xuan-ran-liu-cheng/" />
+  <meta name="socialText" content="" />
+  <meta name="description" content="1. 数据准备（Data Pipeline）
+
+
+数据源（Source）
+生成或读取原始数据（如vtkImageData、vtkPolyData）。
+vtkNew&amp;lt;vtkSphereSource&amp;gt; sphereSource; /..." />
+  <meta name="referrer" content="always" />
+  
+  
+    
+  
+</head>
+
+<body class="is-preload">
+  <!-- Wrapper -->
+  <div id="wrapper">
+
+    <!-- Header -->
+<header id="header">
+  <div class="inner">
+    <!-- Logo -->
+    <a href="https://kollen.cn" class="logo">
+      <span class="symbol"
+        ><img
+          src="https://kollen.cn/images/avatar.png?v=1753868442156"
+          alt=""
+        />
+      </span>
+      <div class="site-title"> Kollen </div>
+    </a>
+
+    <!-- Nav -->
+    <nav>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+  <ul>
+    
+    
+      <li><a href="/" class="menu">
+        首页
+      </a></li>
+      
+    
+    
+      <li><a href="/archives" class="menu">
+        归档
+      </a></li>
+      
+    
+    
+      <li><a href="/tags" class="menu">
+        标签
+      </a></li>
+      
+    
+    
+      <li><a href="/post/about" class="menu">
+        关于
+      </a></li>
+      
+    
+  </ul>
+</nav>
+
+    <!-- Main -->
+    <div id="main">
+      <div class="inner">
+        <div class="post-pagetitle">
+          <h1>
+            VTK渲染流程
+          </h1>
+        </div>
+        <div class="post-info">
+          <time class="post-time">
+            2025-07-20
+          </time>
+          <span class="read-times">
+            3 min read
+          </span>
+          
+          <a href="https://kollen.cn/tag/FHVxYYOg0g/" class="post-tags">
+            # vtk
+          </a>
+          
+        </div>
+        
+        <img src='https://kollen.cn/post-images/vtk-xuan-ran-liu-cheng.jpg' class="post-feature" alt="" />
+        
+        <div class="post-content-wrapper">
+          <div class="post-content">
+            <h3 id="1-数据准备data-pipeline">1. 数据准备（Data Pipeline）</h3>
+<ul>
+<li>
+<p>数据源（Source）<br>
+生成或读取原始数据（如<code>vtkImageData</code>、<code>vtkPolyData</code>）。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkSphereSource&gt; sphereSource; // 创建一个球体数据源
+sphereSource-&gt;SetRadius(5.0);
+</code></pre>
+</li>
+<li>
+<p>数据处理（Filter）<br>
+对数据进行转换或提取（如裁剪、平滑、计算等）。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkClipPolyData&gt; clipFilter; // 裁剪数据
+clipFilter-&gt;SetInputConnection(sphereSource-&gt;GetOutputPort());
+</code></pre>
+</li>
+</ul>
+<h3 id="2-可视化映射visualization-mapping">2. 可视化映射（Visualization Mapping）</h3>
+<ul>
+<li>
+<p>Mapper（映射器）<br>
+将数据转换为几何图元（点、线、面）或纹理。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkPolyDataMapper&gt; mapper;
+mapper-&gt;SetInputConnection(clipFilter-&gt;GetOutputPort());
+</code></pre>
+</li>
+<li>
+<p>属性设置（Property）<br>
+定义颜色、透明度、光照等视觉属性。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkProperty&gt; property;
+property-&gt;SetColor(1, 0, 0); // 红色
+property-&gt;SetOpacity(0.5); // 半透明
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3 id="3-渲染绘制rendering">3. 渲染绘制（Rendering）</h3>
+<ul>
+<li>
+<p>Actor（演员）<br>
+组合Mapper和Property，表示场景中的实体。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkActor&gt; actor;
+actor-&gt;SetMapper(mapper);
+actor-&gt;SetProperty(property);
+</code></pre>
+</li>
+<li>
+<p>Renderer（渲染器）<br>
+管理场景中的Actor、光照、相机等。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkRenderer&gt; renderer;
+renderer-&gt;AddActor(actor);
+renderer-&gt;SetBackground(0.1, 0.2, 0.3); // 设置背景色
+</code></pre>
+</li>
+<li>
+<p>RenderWindow（渲染窗口）<br>
+显示渲染结果的窗口。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkRenderWindow&gt; renderWindow;
+renderWindow-&gt;AddRenderer(renderer);
+renderWindow-&gt;SetSize(800, 600); // 窗口尺寸
+</code></pre>
+</li>
+<li>
+<p>Camera（相机）<br>
+控制观察视角（位置、焦点、视角等）。</p>
+<pre><code class="language-c++">renderer-&gt;GetActiveCamera()-&gt;Zoom(1.5); // 放大1.5倍
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3 id="4-交互与事件循环interaction">4. 交互与事件循环（Interaction）</h3>
+<ul>
+<li>
+<p>RenderWindowInteractor（交互器）<br>
+处理用户输入（鼠标、键盘）并触发渲染更新。</p>
+<pre><code class="language-c++">vtkNew&lt;vtkRenderWindowInteractor&gt; interactor;
+interactor-&gt;SetRenderWindow(renderWindow);
+interactor-&gt;Initialize(); // 初始化事件系统
+interactor-&gt;Start(); // 启动事件循环
+</code></pre>
+</li>
+</ul>
+<h3 id="完整代码示例">完整代码示例</h3>
+<pre><code class="language-c++">#include &lt;vtkActor.h&gt;
+#include &lt;vtkPolyDataMapper.h&gt;
+#include &lt;vtkRenderer.h&gt;
+#include &lt;vtkRenderWindow.h&gt;
+#include &lt;vtkRenderWindowInteractor.h&gt;
+#include &lt;vtkSphereSource.h&gt;
+
+int main() {
+// 1. 数据源
+vtkNew&lt;vtkSphereSource&gt; sphereSource;
+sphereSource-&gt;SetRadius(5.0);
+
+    // 2. 映射器
+    vtkNew&lt;vtkPolyDataMapper&gt; mapper;
+    mapper-&gt;SetInputConnection(sphereSource-&gt;GetOutputPort());
+
+    // 3. 演员
+    vtkNew&lt;vtkActor&gt; actor;
+    actor-&gt;SetMapper(mapper);
+
+    // 4. 渲染器和窗口
+    vtkNew&lt;vtkRenderer&gt; renderer;
+    renderer-&gt;AddActor(actor);
+    renderer-&gt;SetBackground(0.1, 0.2, 0.3);
+
+    vtkNew&lt;vtkRenderWindow&gt; renderWindow;
+    renderWindow-&gt;AddRenderer(renderer);
+    renderWindow-&gt;SetSize(800, 600);
+
+    // 5. 交互器
+    vtkNew&lt;vtkRenderWindowInteractor&gt; interactor;
+    interactor-&gt;SetRenderWindow(renderWindow);
+    interactor-&gt;Initialize();
+    interactor-&gt;Start();
+
+    return 0;
+
+}
+</code></pre>
+
+          </div>
+          <div class="toc-container">
+            <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1-%E6%95%B0%E6%8D%AE%E5%87%86%E5%A4%87data-pipeline">1. 数据准备（Data Pipeline）</a></li>
+<li><a href="#2-%E5%8F%AF%E8%A7%86%E5%8C%96%E6%98%A0%E5%B0%84visualization-mapping">2. 可视化映射（Visualization Mapping）</a></li>
+<li><a href="#3-%E6%B8%B2%E6%9F%93%E7%BB%98%E5%88%B6rendering">3. 渲染绘制（Rendering）</a></li>
+<li><a href="#4-%E4%BA%A4%E4%BA%92%E4%B8%8E%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AFinteraction">4. 交互与事件循环（Interaction）</a></li>
+<li><a href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B">完整代码示例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+
+        <div class="page-count">
+          
+
+          
+        </div>
+      </div>
+
+      <div class="post-pagination inner">
+        
+        <div class="next-post">
+          <div>
+            <a href="https://kollen.cn/post/vuethreejs-mo-ban/">下一篇</a>
+          </div>
+        </div>
+        
+        
+        <div class="prev-post">
+          <div>
+            <a href="https://kollen.cn/post/vtk-yi-xue-ying-xiang-fang-xiang/">上一篇</a>
+          </div>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <!-- back to top -->
+    <button oneclik="topFunction()" id="BackToTop">
+      TOP
+    </button>
+
+    <div class="post-comment inner">
+      <div class="post-comment">
+        
+
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer id="footer">
+  <div class="inner">
+    <section>
+      <h2>Follow</h2>
+      <ul class="icons">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ul>
+    </section>
+    <ul class="copyright">
+      <li>
+        <a href="https://kollen.cn/atom.xml" target="_blank">
+          RSS
+        </a> 
+      </li>
+      <li><a href="https://github.com/wherelse/gridea-theme-phantom">Theme Phantom</a></li>
+      <li>Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a></li>
+      
+    </ul>
+  </div>
+</footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://kollen.cn/media/scripts/jquery.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/highlight.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/browser.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/breakpoints.min.js"></script>
+  <script src="https://kollen.cn/media/scripts/util.js"></script>
+  <script src="https://kollen.cn/media/scripts/main.js"></script>
+  <!--  -->
+  <script>hljs.highlightAll();</script>
+  <script>
+    post_scroll();
+    back_to_top();
+  </script>
+</body>
+
+</html>
